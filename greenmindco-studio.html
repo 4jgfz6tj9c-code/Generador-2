@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>GreenMindCo · Studio</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,700;0,800;0,900;1,900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0b0b0b;
+  --surface: #141414;
+  --surface2: #1e1e1e;
+  --green: #4ade80;
+  --accent: #a3e635;
+  --text: #f0f0f0;
+  --muted: #555;
+  --border: #222;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color: transparent; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  min-height: 100vh;
+  padding-bottom: 40px;
+}
+
+/* HEADER */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  border-bottom: 1px solid var(--border);
+  gap: 10px;
+}
+
+.header-logo {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 20px;
+  font-weight: 900;
+  letter-spacing: 2px;
+  color: var(--green);
+  text-transform: uppercase;
+}
+
+.header-dot { width:4px; height:4px; border-radius:50%; background:var(--muted); }
+
+.header-sub {
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* LAYOUT */
+.layout {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 24px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* PANELS */
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.panel-title {
+  font-size: 10px;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding: 14px 18px 0;
+  font-weight: 600;
+}
+
+/* UPLOAD ZONE */
+.upload-zone {
+  margin: 12px 16px 16px;
+  border: 1.5px dashed #333;
+  border-radius: 12px;
+  padding: 28px 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+
+.upload-zone:hover, .upload-zone.drag { border-color: var(--green); background: rgba(74,222,128,0.04); }
+
+.upload-zone input {
+  position: absolute; inset:0; opacity:0; cursor:pointer; width:100%; height:100%;
+}
+
+.upload-icon { font-size: 28px; margin-bottom: 8px; }
+.upload-text { font-size: 13px; color: var(--muted); }
+.upload-text strong { color: var(--green); }
+
+#img-preview-thumb {
+  width: 100%; max-height: 140px; object-fit: cover;
+  border-radius: 10px; display:none; margin-bottom: 8px;
+}
+
+/* FIELDS */
+.fields { padding: 12px 16px 16px; display: flex; flex-direction: column; gap: 12px; }
+
+.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+.field { display: flex; flex-direction: column; gap: 5px; }
+
+.field label {
+  font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase;
+  color: var(--muted); font-weight: 600;
+}
+
+.field input, .field textarea, .field select {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 12px;
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s;
+  -webkit-appearance: none;
+}
+
+.field input:focus, .field textarea:focus { border-color: var(--green); }
+.field textarea { resize: vertical; min-height: 100px; line-height: 1.5; }
+
+/* STYLE CONTROLS */
+.style-row {
+  padding: 0 16px 16px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.style-btn {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 8px;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: center;
+}
+
+.style-btn.active { border-color: var(--green); color: var(--green); background: rgba(74,222,128,0.08); }
+
+/* GENERATE BTN */
+.btn-generate {
+  width: calc(100% - 32px);
+  margin: 0 16px 16px;
+  background: var(--green);
+  color: #0b0b0b;
+  border: none;
+  border-radius: 12px;
+  padding: 16px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 20px;
+  font-weight: 900;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-generate:active { background: var(--accent); transform: scale(0.98); }
+
+/* CANVAS PREVIEW */
+.preview-section { display: none; }
+.preview-section.show { display: block; }
+
+.preview-tabs {
+  display: flex;
+  border-bottom: 1px solid var(--border);
+}
+
+.preview-tab {
+  flex: 1;
+  padding: 12px;
+  text-align: center;
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--muted);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s;
+}
+
+.preview-tab.active { color: var(--green); border-bottom-color: var(--green); }
+
+.canvas-wrap {
+  padding: 20px 16px 0;
+  display: flex;
+  justify-content: center;
+}
+
+canvas {
+  width: 100%;
+  max-width: 340px;
+  height: auto;
+  border-radius: 8px;
+  display: block;
+}
+
+/* ACTION BUTTONS */
+.actions {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.btn-download {
+  width: 100%;
+  background: var(--green);
+  color: #0b0b0b;
+  border: none;
+  border-radius: 12px;
+  padding: 15px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 18px;
+  font-weight: 900;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.btn-download:active { background: var(--accent); transform: scale(0.98); }
+
+.btn-instagram {
+  width: 100%;
+  background: linear-gradient(135deg, #833ab4, #fd1d1d, #fcb045);
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  padding: 15px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 18px;
+  font-weight: 900;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.btn-instagram:active { opacity: 0.85; transform: scale(0.98); }
+
+.btn-copy {
+  width: 100%;
+  background: transparent;
+  color: var(--muted);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 13px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+  letter-spacing: 0.5px;
+}
+
+.btn-copy:active { border-color: var(--green); color: var(--green); }
+.btn-copy.copied { border-color: var(--green); color: var(--green); }
+
+/* CAPTION BOX */
+.caption-preview {
+  margin: 0 16px 16px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px;
+  font-size: 13px;
+  color: #888;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  user-select: all;
+  -webkit-user-select: all;
+}
+
+/* SAVE NOTE */
+.save-note {
+  margin: 0 16px 4px;
+  font-size: 11px;
+  color: #444;
+  text-align: center;
+  letter-spacing: 0.5px;
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <span class="header-logo">GreenMindCo</span>
+  <span class="header-dot"></span>
+  <span class="header-sub">Post Studio</span>
+</div>
+
+<div class="layout">
+
+  <!-- IMAGE UPLOAD -->
+  <div class="panel">
+    <div class="panel-title">Imagen de fondo</div>
+    <div class="upload-zone" id="uploadZone">
+      <input type="file" id="imgFile" accept="image/*" onchange="loadImage(this)">
+      <img id="img-preview-thumb" />
+      <div class="upload-icon" id="uploadIcon">🖼️</div>
+      <div class="upload-text" id="uploadText"><strong>Toca para subir</strong> una foto desde tu iPad</div>
+    </div>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="panel">
+    <div class="panel-title">Contenido</div>
+    <div class="fields">
+      <div class="field-row">
+        <div class="field">
+          <label>Categoría</label>
+          <select id="category">
+            <option>🔴 Breaking</option>
+            <option>🧪 Ciencia</option>
+            <option>⚖️ Legalización</option>
+            <option>🌿 Cultura</option>
+            <option>💡 Consejo</option>
+            <option>📊 Estudio</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Idioma activo</label>
+          <select id="activeLang" onchange="switchLang()">
+            <option value="es">🇪🇸 Español</option>
+            <option value="en">🇺🇸 English</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field" id="field-es">
+        <label>Titular en Español</label>
+        <input type="text" id="headline-es" placeholder="Ej: EE.UU. reclasifica el cannabis" value="EE.UU. reclasifica el cannabis al Schedule III">
+      </div>
+
+      <div class="field" id="field-en" style="display:none">
+        <label>Headline in English</label>
+        <input type="text" id="headline-en" placeholder="Ej: U.S. reclassifies cannabis to Schedule III" value="U.S. reclassifies cannabis to Schedule III">
+      </div>
+
+      <div class="field" id="caption-field-es">
+        <label>Caption Español</label>
+        <textarea id="caption-es">🇺🇸 HISTÓRICO — EE.UU. DA EL PASO
+
+El Departamento de Justicia de Trump reclasificó el cannabis de Schedule I a Schedule III.
+
+✅ Más investigación científica
+✅ Beneficios fiscales para empresas
+✅ Abre la banca al sector
+
+❌ No legaliza federalmente
+
+Audiencia final: 29 de junio.
+
+#cannabis #legalización #GreenMindCo</textarea>
+      </div>
+
+      <div class="field" id="caption-field-en" style="display:none">
+        <label>Caption English</label>
+        <textarea id="caption-en">🇺🇸 HISTORIC — U.S. MAKES ITS MOVE
+
+Trump's DOJ just reclassified cannabis from Schedule I to Schedule III.
+
+✅ Easier medical research
+✅ Tax benefits for cannabis businesses
+✅ Opens banking pathways
+
+❌ Does NOT federally legalize cannabis
+
+Final hearing: June 29.
+
+#cannabis #legalization #GreenMindCo</textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- STYLE -->
+  <div class="panel">
+    <div class="panel-title">Estilo de texto</div>
+    <div class="style-row" style="margin-top:12px">
+      <button class="style-btn active" onclick="setStyle('bottom', this)">Abajo</button>
+      <button class="style-btn" onclick="setStyle('center', this)">Centro</button>
+      <button class="style-btn" onclick="setStyle('top', this)">Arriba</button>
+    </div>
+    <div class="style-row">
+      <button class="style-btn active" onclick="setOverlay('dark', this)">Oscuro</button>
+      <button class="style-btn" onclick="setOverlay('medium', this)">Medio</button>
+      <button class="style-btn" onclick="setOverlay('light', this)">Suave</button>
+    </div>
+  </div>
+
+  <!-- GENERATE -->
+  <div class="panel">
+    <button class="btn-generate" onclick="generateBoth()">⚡ Generar Posts</button>
+  </div>
+
+  <!-- PREVIEW ES -->
+  <div class="panel preview-section" id="preview-es">
+    <div class="preview-tabs">
+      <div class="preview-tab active">🇪🇸 Español</div>
+    </div>
+    <div class="canvas-wrap">
+      <canvas id="canvas-es" width="1080" height="1080"></canvas>
+    </div>
+    <div class="actions">
+      <p class="save-note">📱 En iPad: mantén pulsada la imagen → "Guardar en Fotos"</p>
+      <button class="btn-download" onclick="downloadCanvas('es')">⬇️ Descargar ES</button>
+      <div class="caption-preview" id="cap-es-display"></div>
+      <button class="btn-copy" id="copy-es" onclick="copyCaption('es')">📋 Copiar caption ES</button>
+      <button class="btn-instagram" onclick="openInstagram()">📲 Abrir Instagram</button>
+    </div>
+  </div>
+
+  <!-- PREVIEW EN -->
+  <div class="panel preview-section" id="preview-en">
+    <div class="preview-tabs">
+      <div class="preview-tab active">🇺🇸 English</div>
+    </div>
+    <div class="canvas-wrap">
+      <canvas id="canvas-en" width="1080" height="1080"></canvas>
+    </div>
+    <div class="actions">
+      <p class="save-note">📱 En iPad: mantén pulsada la imagen → "Guardar en Fotos"</p>
+      <button class="btn-download" onclick="downloadCanvas('en')">⬇️ Descargar EN</button>
+      <div class="caption-preview" id="cap-en-display"></div>
+      <button class="btn-copy" id="copy-en" onclick="copyCaption('en')">📋 Copy caption EN</button>
+      <button class="btn-instagram" onclick="openInstagram()">📲 Open Instagram</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+let loadedImage = null;
+let textPosition = 'bottom';
+let overlayStrength = 'dark';
+
+// Load image
+function loadImage(input) {
+  if (!input.files || !input.files[0]) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const img = new Image();
+    img.onload = () => {
+      loadedImage = img;
+      const thumb = document.getElementById('img-preview-thumb');
+      thumb.src = e.target.result;
+      thumb.style.display = 'block';
+      document.getElementById('uploadIcon').style.display = 'none';
+      document.getElementById('uploadText').textContent = '✓ Imagen cargada';
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(input.files[0]);
+}
+
+// Switch lang fields
+function switchLang() {
+  const lang = document.getElementById('activeLang').value;
+  document.getElementById('field-es').style.display = lang === 'es' ? 'flex' : 'none';
+  document.getElementById('field-en').style.display = lang === 'en' ? 'flex' : 'none';
+  document.getElementById('caption-field-es').style.display = lang === 'es' ? 'flex' : 'none';
+  document.getElementById('caption-field-en').style.display = lang === 'en' ? 'flex' : 'none';
+}
+
+// Style controls
+function setStyle(pos, btn) {
+  textPosition = pos;
+  btn.closest('.style-row').querySelectorAll('.style-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+function setOverlay(strength, btn) {
+  overlayStrength = strength;
+  btn.closest('.style-row').querySelectorAll('.style-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+// Draw canvas
+function drawPost(canvasId, lang) {
+  const canvas = document.getElementById(canvasId);
+  const ctx = canvas.getContext('2d');
+  const W = 1080, H = 1080;
+  canvas.width = W; canvas.height = H;
+
+  // Background
+  if (loadedImage) {
+    // Cover fit
+    const scale = Math.max(W / loadedImage.width, H / loadedImage.height);
+    const sw = loadedImage.width * scale;
+    const sh = loadedImage.height * scale;
+    const sx = (W - sw) / 2;
+    const sy = (H - sh) / 2;
+    ctx.drawImage(loadedImage, sx, sy, sw, sh);
+  } else {
+    // Default green gradient background
+    const grad = ctx.createLinearGradient(0, 0, W, H);
+    grad.addColorStop(0, '#0a1a0a');
+    grad.addColorStop(0.5, '#0f2a0f');
+    grad.addColorStop(1, '#0a1a0a');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, W, H);
+
+    // Subtle leaf pattern
+    ctx.fillStyle = 'rgba(74,222,128,0.04)';
+    for (let i = 0; i < 5; i++) {
+      ctx.beginPath();
+      ctx.arc(200 + i * 180, 400 + (i % 2) * 200, 120, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+
+  // Overlay
+  const overlayAlpha = overlayStrength === 'dark' ? 0.72 : overlayStrength === 'medium' ? 0.55 : 0.35;
+
+  if (textPosition === 'bottom') {
+    const grad = ctx.createLinearGradient(0, H * 0.35, 0, H);
+    grad.addColorStop(0, `rgba(0,0,0,0)`);
+    grad.addColorStop(0.4, `rgba(0,0,0,${overlayAlpha * 0.6})`);
+    grad.addColorStop(1, `rgba(0,0,0,${overlayAlpha})`);
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, W, H);
+  } else if (textPosition === 'top') {
+    const grad = ctx.createLinearGradient(0, 0, 0, H * 0.65);
+    grad.addColorStop(0, `rgba(0,0,0,${overlayAlpha})`);
+    grad.addColorStop(1, `rgba(0,0,0,0)`);
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, W, H);
+  } else {
+    ctx.fillStyle = `rgba(0,0,0,${overlayAlpha * 0.7})`;
+    ctx.fillRect(0, 0, W, H);
+  }
+
+  // Top green bar
+  const barGrad = ctx.createLinearGradient(0, 0, W, 0);
+  barGrad.addColorStop(0, '#4ade80');
+  barGrad.addColorStop(1, '#a3e635');
+  ctx.fillStyle = barGrad;
+  ctx.fillRect(0, 0, W, 6);
+
+  // Category badge
+  const cat = document.getElementById('category').value;
+  const catText = cat.replace(/[^\w\s]/gi, '').trim().toUpperCase();
+  ctx.font = 'bold 26px "Barlow Condensed", sans-serif';
+  const catW = ctx.measureText(catText).width + 40;
+  ctx.fillStyle = '#4ade80';
+  roundRect(ctx, 40, 52, catW, 44, 6);
+  ctx.fillStyle = '#0b0b0b';
+  ctx.font = 'bold 24px "Barlow Condensed", sans-serif';
+  ctx.textAlign = 'left';
+  ctx.fillText(catText, 60, 80);
+
+  // Lang badge
+  const langLabel = lang === 'es' ? '🇪🇸 ES' : '🇺🇸 EN';
+  ctx.font = 'bold 24px "DM Sans", sans-serif';
+  ctx.strokeStyle = 'rgba(255,255,255,0.6)';
+  ctx.lineWidth = 2;
+  const langW = ctx.measureText(langLabel).width + 32;
+  roundRectStroke(ctx, W - langW - 40, 52, langW, 44, 6);
+  ctx.fillStyle = 'rgba(255,255,255,0.9)';
+  ctx.textAlign = 'right';
+  ctx.fillText(langLabel, W - 56, 80);
+
+  // Headline
+  const headline = lang === 'es'
+    ? document.getElementById('headline-es').value
+    : document.getElementById('headline-en').value;
+
+  const lines = wrapText(ctx, headline.toUpperCase(), W - 80, 88);
+  const lineH = 96;
+  const totalH = lines.length * lineH;
+
+  let startY;
+  if (textPosition === 'bottom') startY = H - 160 - totalH;
+  else if (textPosition === 'top') startY = 160;
+  else startY = (H - totalH) / 2 - 40;
+
+  ctx.font = 'bold italic 88px "Barlow Condensed", sans-serif';
+  ctx.textAlign = 'left';
+  ctx.shadowColor = 'rgba(0,0,0,0.8)';
+  ctx.shadowBlur = 20;
+  ctx.shadowOffsetY = 4;
+
+  lines.forEach((line, i) => {
+    // White text with green on last word of first line
+    ctx.fillStyle = '#ffffff';
+    ctx.fillText(line, 40, startY + i * lineH);
+  });
+
+  ctx.shadowBlur = 0; ctx.shadowOffsetY = 0;
+
+  // Bottom brand + date
+  const today = new Date().toLocaleDateString(lang === 'es' ? 'es-ES' : 'en-US', { day:'numeric', month:'short', year:'numeric' }).toUpperCase();
+  ctx.font = 'bold 28px "Barlow Condensed", sans-serif';
+  ctx.textAlign = 'left';
+  ctx.fillStyle = '#4ade80';
+  ctx.fillText('@GREENMINDCO', 40, H - 44);
+  ctx.fillStyle = 'rgba(255,255,255,0.4)';
+  ctx.font = '22px "DM Sans", sans-serif';
+  ctx.fillText(today, 40 + ctx.measureText('@GREENMINDCO').width + 20, H - 44);
+
+  // Bottom right dot
+  ctx.fillStyle = 'rgba(255,255,255,0.15)';
+  ctx.beginPath();
+  ctx.arc(W - 50, H - 44, 4, 0, Math.PI * 2);
+  ctx.fill();
+}
+
+function wrapText(ctx, text, maxWidth, fontSize) {
+  ctx.font = `bold italic ${fontSize}px "Barlow Condensed", sans-serif`;
+  const words = text.split(' ');
+  const lines = [];
+  let line = '';
+
+  words.forEach(word => {
+    const test = line ? line + ' ' + word : word;
+    if (ctx.measureText(test).width > maxWidth && line) {
+      lines.push(line);
+      line = word;
+    } else {
+      line = test;
+    }
+  });
+  if (line) lines.push(line);
+  return lines;
+}
+
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+  ctx.lineTo(x + r, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+  ctx.lineTo(x, y + r);
+  ctx.quadraticCurveTo(x, y, x + r, y);
+  ctx.closePath();
+  ctx.fill();
+}
+
+function roundRectStroke(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+  ctx.lineTo(x + r, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+  ctx.lineTo(x, y + r);
+  ctx.quadraticCurveTo(x, y, x + r, y);
+  ctx.closePath();
+  ctx.stroke();
+}
+
+function generateBoth() {
+  drawPost('canvas-es', 'es');
+  drawPost('canvas-en', 'en');
+
+  document.getElementById('cap-es-display').textContent = document.getElementById('caption-es').value;
+  document.getElementById('cap-en-display').textContent = document.getElementById('caption-en').value;
+
+  document.getElementById('preview-es').classList.add('show');
+  document.getElementById('preview-en').classList.add('show');
+
+  document.getElementById('preview-es').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function downloadCanvas(lang) {
+  const canvas = document.getElementById(`canvas-${lang}`);
+  const link = document.createElement('a');
+  link.download = `greenmindco-post-${lang}.png`;
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+}
+
+function copyCaption(lang) {
+  const text = document.getElementById(`caption-${lang}`).value;
+  const btn = document.getElementById(`copy-${lang}`);
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(text).then(() => {
+      btn.textContent = '✓ Copiado!';
+      btn.classList.add('copied');
+      setTimeout(() => {
+        btn.textContent = lang === 'es' ? '📋 Copiar caption ES' : '📋 Copy caption EN';
+        btn.classList.remove('copied');
+      }, 2000);
+    });
+  }
+}
+
+function openInstagram() {
+  window.open('https://www.instagram.com', '_blank');
+}
+
+// Generate on load with defaults
+window.onload = () => {
+  setTimeout(() => generateBoth(), 300);
+};
+</script>
+</body>
+</html>
